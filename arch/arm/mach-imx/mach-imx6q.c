@@ -34,6 +34,7 @@
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/system_misc.h>
+#include <linux/ti_wilink_st.h>
 
 #include "common.h"
 #include "cpuidle.h"
@@ -262,6 +263,32 @@ static void __init imx6q_axi_init(void)
 	}
 }
 
+static struct ti_st_plat_data wilink_pdata = {
+	.nshutdown_gpio = 160,
+	.dev_name = "/dev/ttymxc3",
+	.flow_cntrl = 1,
+	.baud_rate = 300000,
+};
+
+static struct platform_device wl18xx_device = {
+	.name   = "kim",
+	.id     = -1,
+	.dev    = {
+		.platform_data = &wilink_pdata,
+	}
+};
+
+static struct platform_device btwilink_device = {
+	        .name   = "btwilink",
+		.id     = -1,
+};
+
+static void __init hb2_wl18xx_init(void)
+{
+	platform_device_register(&wl18xx_device);
+	platform_device_register(&btwilink_device);
+}
+
 static void __init imx6q_init_machine(void)
 {
 	struct device *parent;
@@ -284,6 +311,7 @@ static void __init imx6q_init_machine(void)
 	cpu_is_imx6q() ?  imx6q_pm_init() : imx6dl_pm_init();
 	imx6q_1588_init();
 	imx6q_axi_init();
+	hb2_wl18xx_init();
 }
 
 #define OCOTP_CFG3			0x440
