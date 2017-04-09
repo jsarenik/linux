@@ -160,6 +160,7 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6dl-hummingboard-som-v15.dtb \
 	imx6dl-hummingboard2.dtb \
 	imx6dl-hummingboard2-som-v15.dtb \
+	imx6dl-thirdeye.dtb \
 	imx6dl-sabreauto.dtb \
 	imx6dl-sabreauto-flexcan1.dtb \
 	imx6dl-sabreauto-ecspi.dtb \
