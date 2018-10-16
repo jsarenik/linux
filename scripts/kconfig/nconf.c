@@ -1040,11 +1040,11 @@ static int do_match(int key, struct match_state *state, int *ans)
 		adj_match_dir(&state->match_direction);
 		*ans = get_mext_match(state->pattern,
 				state->match_direction);
-	} else if (key == KEY_DOWN) {
+	} else if (key == KEY_DOWN || key == 'j') {
 		state->match_direction = FIND_NEXT_MATCH_DOWN;
 		*ans = get_mext_match(state->pattern,
 				state->match_direction);
-	} else if (key == KEY_UP) {
+	} else if (key == KEY_UP || key == 'k') {
 		state->match_direction = FIND_NEXT_MATCH_UP;
 		*ans = get_mext_match(state->pattern,
 				state->match_direction);
@@ -1110,9 +1110,11 @@ static void conf(struct menu *menu)
 						(struct menu *) item_data()))
 				break;
 			switch (res) {
+			case 'j':
 			case KEY_DOWN:
 				menu_driver(curses_menu, REQ_DOWN_ITEM);
 				break;
+			case 'k':
 			case KEY_UP:
 				menu_driver(curses_menu, REQ_UP_ITEM);
 				break;
@@ -1128,7 +1130,7 @@ static void conf(struct menu *menu)
 			case KEY_END:
 				menu_driver(curses_menu, REQ_LAST_ITEM);
 				break;
-			case 'h':
+			case 'H':
 			case '?':
 				show_help((struct menu *) item_data());
 				break;
@@ -1136,14 +1138,17 @@ static void conf(struct menu *menu)
 			if (res == 10 || res == 27 ||
 				res == 32 || res == 'n' || res == 'y' ||
 				res == KEY_LEFT || res == KEY_RIGHT ||
-				res == 'm')
+				res == 'm' || res == 'l' || res == 'h' ||
+				res == 'q')
 				break;
 			refresh_all_windows(main_window);
 		}
 
 		refresh_all_windows(main_window);
 		/* if ESC or left*/
-		if (res == 27 || (menu != &rootmenu && res == KEY_LEFT))
+		if (res == 27 || (menu != &rootmenu &&
+			(res == KEY_LEFT || res == 'h')) ||
+			res == 'q')
 			break;
 
 		/* remember location in the menu */
@@ -1165,6 +1170,7 @@ static void conf(struct menu *menu)
 			else if (item_is_tag('m'))
 				conf(submenu);
 			break;
+		case 'l':
 		case KEY_RIGHT:
 		case 10: /* ENTER WAS PRESSED */
 			switch (item_tag()) {
@@ -1292,9 +1298,11 @@ static void conf_choice(struct menu *menu)
 						(struct menu *) item_data()))
 				break;
 			switch (res) {
+			case 'j':
 			case KEY_DOWN:
 				menu_driver(curses_menu, REQ_DOWN_ITEM);
 				break;
+			case 'k':
 			case KEY_UP:
 				menu_driver(curses_menu, REQ_UP_ITEM);
 				break;
@@ -1310,19 +1318,19 @@ static void conf_choice(struct menu *menu)
 			case KEY_END:
 				menu_driver(curses_menu, REQ_LAST_ITEM);
 				break;
-			case 'h':
+			case 'H':
 			case '?':
 				show_help((struct menu *) item_data());
 				break;
 			}
 			if (res == 10 || res == 27 || res == ' ' ||
-					res == KEY_LEFT){
+					res == KEY_LEFT || res == 'h' ){
 				break;
 			}
 			refresh_all_windows(main_window);
 		}
 		/* if ESC or left */
-		if (res == 27 || res == KEY_LEFT)
+		if (res == 27 || res == KEY_LEFT || res == 'h')
 			break;
 
 		child = item_data();
@@ -1330,11 +1338,12 @@ static void conf_choice(struct menu *menu)
 			continue;
 		switch (res) {
 		case ' ':
+		case 'l':
 		case  10:
 		case KEY_RIGHT:
 			sym_set_tristate_value(child->sym, yes);
 			return;
-		case 'h':
+		case 'H':
 		case '?':
 			show_help(child);
 			active = child->sym;
